@@ -1,8 +1,24 @@
 <?php
+/*
+ * AlfaHandlerRest.php
+ * Created for project JOOMLA 3.x
+ * subpackage PAYMENT/CPGALFABANK plugin
+ * based on https://github.com/SatanaKonst/AlfaBank_API
+ * version 1.0.0
+ * https://econsultlab.ru
+ * mail: info@econsultlab.ru
+ * Released under the GNU General Public License
+ * Copyright (c) 2022 Econsult Lab.
+ */
 
 namespace Alfabank;
+use Alfabank\OrderParams;
+use Exception;
 
-
+/**
+ * @version 1.1
+ * @since 1.0
+ */
 class AlfaHandlerRest
 {
     protected $USERNAME;
@@ -13,7 +29,7 @@ class AlfaHandlerRest
     public function __construct($USERNAME,$PASSWORD,$RETURN_URL)
     {
         if(empty($USERNAME) || empty($PASSWORD) || empty($RETURN_URL)){
-            throw new \Exception('Empty requared parameters');
+            throw new Exception('Empty required parameters');
         }
         $this->USERNAME = $USERNAME;
         $this->PASSWORD = $PASSWORD;
@@ -65,6 +81,22 @@ class AlfaHandlerRest
         return $this->client->registerDo($params,$returnPaymentOrderId,$prod);
     }
 
+
+    /**
+     * ЗАПРОС РЕГИСТРАЦИИ ОДНОСТАДИЙНОГО ПЛАТЕЖА В ПЛАТЕЖНОМ ШЛЮЗЕ С ПОЛНЫМИ ПАРАМЕТРАМИ
+     * @param \Alfabank\OrderParams $orderParams
+     * @param bool $returnPaymentOrderId
+     * @param bool $prod
+     * @return mixed
+     * @throws Exception
+     * @since 1.1
+     */
+    public function createOrderSinglePaymentFull(OrderParams $orderParams, bool $returnPaymentOrderId=false, bool $prod=false ) {
+        $params = $orderParams->getParamsArray();
+        return $this->client->registerDo($params,$returnPaymentOrderId,$prod);
+    }
+
+
     //Создание двухстадийного платежа
     /**
      * РЕГИСТРАЦИЯ ДВУХСТАДИЙНОГО ПЛАТЕЖА В ПЛАТЕЖНОМ ШЛЮЗЕ
@@ -100,7 +132,7 @@ class AlfaHandlerRest
      * @param string $currency код валюты по ISO 4217
      * @param string $returnPaymentOrderId
      * @return mixed (в случае успеха возвращает ссылку на форму оплаты или ID в платежной системе если установлен $returnPaymentOrderId = true)
-     * @throws \Exception
+     * @throws Exception
      */
     public function createOrderDoublePayment($orderNumber,$amount,$lang='ru',$currency='',$returnPaymentOrderId=false,$prod=false)
     {
@@ -157,12 +189,12 @@ class AlfaHandlerRest
     /**
      * @param $orderId
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getOrderInfo($orderId,$prod=false)
     {
         if (empty($orderId)) {
-            throw new \Exception('Empty orderId');
+            throw new Exception('Empty orderId');
         }
         $data = array(
             'userName' => $this->USERNAME,
