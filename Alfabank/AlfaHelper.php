@@ -89,21 +89,21 @@ abstract class AlfaHelper
             }
 
             // Информация по платежу получена, проводим проверки
-            if ($orderInfo['error']['code']) {
+            if ($orderInfo['ErrorCode']) {
                 // ОШИБКА. Ошибка проверки статуса оплаты
-                static::_logging($orderInfo['error'], $enable_log);
+                static::_logging($orderInfo, $enable_log);
                 return array(
                     'error' =>
                         array(
-                            'code' => $orderInfo['error']['code'],
-                            'message' => $orderInfo['error']['msg']),
-                    'status' => $orderInfo['status'],
+                            'code' => $orderInfo['ErrorCode'],
+                            'message' => $orderInfo['ErrorMessage']),
+                    'status' => $orderInfo['OrderStatus'],
                     'response' => $orderInfo,
                 );
             }
 
             $order_amount = (float)$vars->amount * 100; // Процессинг возвращает сумму платежа в копейках
-            $retrunamount = (float)$orderInfo['response']['Amount'];
+            $retrunamount = (float)$orderInfo['Amount'];
             $epsilon = 0.01; // Допуск
             if (($order_amount - $retrunamount) > $epsilon) {
                 // ОШИБКА. Не соответствие суммы заказа сумме оплаты
