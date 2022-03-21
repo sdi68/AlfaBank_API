@@ -14,11 +14,11 @@
 namespace Alfabank\Exceptions;
 use Exception;
 
-class OrderParamsException extends Exception
+class ParamsException extends Exception
 {
     public function __construct($code = 0)
     {
-        $message = 'PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_'.$code;
+        $message = 'PARAMS_EXCEPTIONS_CODE_'.$code.'_MSG';
         parent::__construct($message, $code);
     }
 

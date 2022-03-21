@@ -14,6 +14,7 @@
 namespace Alfabank;
 
 use PHPUnit\Framework\TestCase;
+use Alfabank\tests\Helper;
 require_once '../autoload.php';
 
 class AlfaHelperTest extends TestCase
@@ -68,7 +69,7 @@ class AlfaHelperTest extends TestCase
 
     public function testValidateSuccessPayment()
     {
-        $response = AlfaHelper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
         $this->assertIsArray($response);
         $this->assertArrayHasKey('status',$response);
         $this->assertArrayHasKey('response',$response);
@@ -81,7 +82,7 @@ class AlfaHelperTest extends TestCase
     {
         // Несоответствие суммы заказа
         $this->vars->amount = 1000;
-        $response = AlfaHelper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
         $this->assertIsArray($response);
         $this->assertArrayHasKey('status',$response);
         $this->assertArrayHasKey('response',$response);
@@ -94,7 +95,7 @@ class AlfaHelperTest extends TestCase
     {
         // Ошибка Неизвестный номер заказа
         $this->data['mdOrder'] = "00847f61-237e-74df-a4d2-bc0502084b8b".'q';
-        $response = AlfaHelper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
         $this->assertIsArray($response);
         $this->assertArrayHasKey('status',$response);
         $this->assertArrayHasKey('response',$response);

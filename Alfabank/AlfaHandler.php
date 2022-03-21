@@ -12,7 +12,7 @@
  */
 
 namespace Alfabank;
-
+use Alfabank\Gateway;
 
 class AlfaHandler
 {
@@ -22,7 +22,8 @@ class AlfaHandler
     protected $RETURN_URL;
     protected $client;
 
-    public function __construct($USERNAME,$PASSWORD,$RETURN_URL)
+
+    public function __construct($USERNAME, $PASSWORD, $RETURN_URL)
     {
         if(empty($USERNAME) || empty($PASSWORD) || empty($RETURN_URL)){
             throw new \Exception('Empty requared parameters');
@@ -30,11 +31,10 @@ class AlfaHandler
         $this->USERNAME = $USERNAME;
         $this->PASSWORD = $PASSWORD;
         $this->RETURN_URL = $RETURN_URL;
-        $this->client = new \Alfabank\Gateway($this->WSDL,array('trace' => true));
+        $this->client = new Gateway($this->WSDL,array('trace' => true));
         $this->client->initAuth($this->USERNAME,$this->PASSWORD);
     }
 
-    //Создать одностадийный платеж
     /**
      * РЕГИСТРАЦИЯ ОДНОСТАДИЙНОГО ПЛАТЕЖА В ПЛАТЕЖНОМ ШЛЮЗЕ
      *      registerOrder
@@ -67,11 +67,10 @@ class AlfaHandler
      * @param $amount (Минимальная единица валюты. Пример 1 копейка. Минимальный размер платежа 1 единица валюты - 1 рубль)
      * @param string $lang в формате 'ru','en'
      * @param string $currency код валюты по ISO 4217
-     * @param string $returnPaymentOrderId
-     * @return mixed (в случае успеха возвращает ссылку на форму оплаты или ID в платежной системе если установлен $returnPaymentOrderId = true)
+     * @return array
      * @throws \Exception
      */
-    public function createOrderSinglePayment($orderNumber,$amount,$lang='ru',$currency='',$returnPaymentOrderId=false){
+    public function createOrderSinglePayment($orderNumber,$amount,$lang='ru',$currency=''){
         $params = array(
             'returnUrl' => $this->RETURN_URL,
             'merchantOrderNumber' => urlencode($orderNumber),
@@ -88,12 +87,7 @@ class AlfaHandler
         if ($response->errorCode != 0) {
             throw new \Exception($response->errorCode.' : '.$response->errorMessage);
         } else {
-            if($returnPaymentOrderId===false){
-                return $response->formUrl;
-            }else{
-                return $response->orderId;
-            }
-
+            return $response;
         }
     }
 

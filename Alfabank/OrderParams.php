@@ -13,41 +13,13 @@
 
 namespace Alfabank;
 
-use Alfabank\Exceptions\OrderParamsException;
-
-
-/**
- * Код ошибки - несоответствие типа параметра
- * @since 1.0
- */
-define('PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_NOT_ARRAY', 0);
-/**
- * Код ошибки неизвестное имя параметра
- * @since 1.0
- */
-define('PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_UNKNOWN_NAME', 1);
-/**
- * Код ошибки неуказано значение обязательного параметра
- * @since 1.0
- */
-define('PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_EMPTY_REQUIRED', 2);
-/**
- * Код ошибки - не указан тип параметра
- * @since 1.0
- */
-define('PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_MISSING_TYPE', 3);
-/**
- * Код ошибки некорректный тип параметра
- * @since 1.0
- */
-define('PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_WRONG_TYPE', 4);
-
+use Alfabank\Common\AbstractParams;
 
 /**
  * Класс параметров заказа
  * @since 1.0
  */
-class OrderParams
+class OrderParams extends AbstractParams
 {
 
     /**
@@ -192,7 +164,7 @@ class OrderParams
 
     /**
      * Конструктор класса
-     * @throws OrderParamsException
+     * @throws Exceptions\ParamsException
      * @since 1.0
      */
     public function __construct(
@@ -220,8 +192,8 @@ class OrderParams
         string $features = ""
     )
     {
-        $this->_setParam('userName', $userName);
-        $this->_setParam('password', $password);
+        parent::__construct($userName, $password);
+
         $this->_setParam('amount', $amount);
         $this->_setParam('orderNumber', $orderNumber);
         $this->_setParam('returnUrl', $returnUrl);
@@ -242,103 +214,5 @@ class OrderParams
         $this->_setParam('expirationDate', $expirationDate);
         $this->_setParam('bindingId', $bindingId);
         $this->_setParam('features', $features);
-    }
-
-    public function getParamsArray($withEmptyNotRequired = false){
-        $out = array();
-        foreach ($this->_params as $param) {
-            if(!$withEmptyNotRequired && $param['required'] == false && empty($param['value']))
-                continue;
-            $out[$param['name']] = $param['value'];
-        }
-        return $out;
-    }
-
-    /**
-     * Получает параметр по наименованию
-     * @param $paramName
-     * @return array|mixed
-     * @throws OrderParamsException
-     * @since 1.0
-     */
-    public function getParamByName($paramName)
-    {
-        $key = $this->_getParamKey($paramName);
-        if ($key === false) {
-            throw new OrderParamsException(PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_UNKNOWN_NAME);
-        }
-        return $this->_params[$key];
-    }
-
-    /**
-     * Устанавливает значение параметра по имени
-     * @param $paramName
-     * @param $paramValue
-     * @return bool|false
-     * @throws OrderParamsException
-     * @since 1.0
-     */
-    private function _setParam($paramName, $paramValue)
-    {
-        $key = $this->_getParamKey($paramName);
-        if ($key !== false) {
-            $this->_params[$key]['value'] = $paramValue;
-            return $this->_validate($key);
-        }
-        return false;
-    }
-
-    /**
-     * Получает ключ параметра по наименованию
-     * @param $paramName
-     * @return false|int
-     * @since 1.0
-     */
-    private function _getParamKey($paramName)
-    {
-        foreach ($this->_params as $key => &$param) {
-            if ($param['name'] == $paramName) {
-                return $key;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Проверяет значение параметра
-     * @param $param
-     *
-     * @return bool
-     *
-     * @throws OrderParamsException
-     * @since 1.0
-     */
-    private function _validate($key): bool
-    {
-        $param = &$this->_params[$key];
-        if (!is_array($param)) {
-            throw new OrderParamsException(PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_NOT_ARRAY);
-        }
-
-        if ($param['required'] && empty($param['value'])) {
-            throw new OrderParamsException(PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_EMPTY_REQUIRED);
-        }
-        $func = '';
-        switch ($param['type']) {
-            case 'string':
-                $func = 'is_string';
-                break;
-            case 'numeric':
-                $func = 'is_numeric';
-                break;
-            default;
-                throw new OrderParamsException(PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_MISSING_TYPE);
-        }
-
-        if (!$func($param['value'])) {
-            throw new OrderParamsException(PLG_CPGALFABANK_ORDER_PARAMS_EXCEPTIONS_CODE_WRONG_TYPE);
-        }
-        return true;
     }
 }
