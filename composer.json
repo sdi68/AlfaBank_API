@@ -1,0 +1,28 @@
+{
+  "name": "sdi68/alfabank_api",
+  "description": "API интернет-эквайринга Альфа Банка",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.0",
+  "homepage": "https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html",
+  "keywords": ["Альфа Банк","интернет-эквайринг", "api"],
+  "authors": [
+    {
+      "name": "ECL",
+      "email": "info@econsultlab.ru"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4.0",
+    "": ""
+  },
+  "require-dev": {
+    "phpunit/phpunit": "9.2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "AlfaBank_API\\": "Alfabank/"
+    }
+  }
+}
