@@ -49,7 +49,7 @@ class AlfaHandlerRest
      * ЗАПРОС РЕГИСТРАЦИИ ОДНОСТАДИЙНОГО ПЛАТЕЖА В ПЛАТЕЖНОМ ШЛЮЗЕ С ПОЛНЫМИ ПАРАМЕТРАМИ
      * @param OrderParams $orderParams Параметры запроса
      * @param bool $prod
-     * @return array
+     * @return array|null
      * @throws GatewayException
      * @since 1.1
      *
@@ -113,10 +113,10 @@ class AlfaHandlerRest
      *       ACCEPTED - заказ оплачен.
      *
      */
-    public function createOrderSinglePaymentSBP(SBPParams $SBPParams, bool $prod=false): array
+    public function getOrderQR(SBPParams $SBPParams, bool $prod=false): array
     {
         $params = $SBPParams->getParamsArray();
-        return $this->client->registerSBPDo($params,$prod);
+        return $this->client->qetQR($params,$prod);
     }
 
     /**
@@ -169,7 +169,6 @@ class AlfaHandlerRest
         if (!empty($currency)) {
             $params['currency'] = $currency;
         }
-
         return $this->client->registerPreAuth($params,$returnPaymentOrderId,$prod);
 
     }

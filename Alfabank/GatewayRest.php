@@ -100,12 +100,15 @@ class GatewayRest
      *
      * @since version 1.0
      */
-    public function registerDo(array $data, bool $prod = false): array
+    public function registerDo(array $data, bool $prod = false)
     {
         if (count($data) == 0) {
             throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_EMPTY_PARAMS_CODE);
         }
         $response = $this->gateway('register.do', $data, $prod);
+        if(is_null($response)) {
+            throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_NULL_RETURNED_CODE);
+        }
         if (isset($response['errorCode'])) { // В случае ошибки вывести ее
             throw new GatewayException($response['errorCode'], $response['errorMessage']);
         } else { // В случае успеха перенаправить пользователя на платежную форму
@@ -209,6 +212,7 @@ class GatewayRest
         }
     }
 
+
     /**
      * Запрос получения QR кода
      * @param array $data Параметры запроса
@@ -229,14 +233,14 @@ class GatewayRest
      *       REJECTED_BY_USER - оплате по QR-коду отклонена мерчантом;
      *       ACCEPTED - заказ оплачен.
      */
-    public function registerSBPDo(array $data, bool $prod = false): array
+    public function qetQR(array $data, bool $prod = false): array
     {
         if (count($data) == 0) {
             throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_EMPTY_PARAMS_CODE);
         }
         $response = $this->gateway('sbp/c2b/qr/dynamic/get.do', $data, $prod);
         if (isset($response['errorCode'])) { // В случае ошибки вывести ее
-            throw new GatewayException($response['errorCode'] . ': ' . $response['errorMessage']);
+            throw new GatewayException($response['errorCode'], $response['errorMessage']);
         } else { // В случае успеха перенаправить пользователя на платежную форму
             return $response;
         }
