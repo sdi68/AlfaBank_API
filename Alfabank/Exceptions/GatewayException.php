@@ -27,7 +27,7 @@ class GatewayException extends Exception
 
     /**
      * @param $code
-     * @param string $msg
+     * @param string|null $msg
      * @since version 1.0
      */
     public function __construct($code, string $msg="")
