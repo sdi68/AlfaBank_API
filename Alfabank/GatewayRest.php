@@ -206,7 +206,7 @@ class GatewayRest
         }
         $response = $this->gateway('getOrderStatus.do', $data, $prod);
         if ($response['ErrorCode']) {
-            throw new GatewayException($response['errorCode'], $response['errorMessage']);
+            throw new GatewayException($response['ErrorCode'], $response['ErrorMessage']);
         } else {
             return $response;
         }
