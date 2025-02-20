@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
+ */
 
 namespace Alfabank\Exceptions;
 
@@ -30,9 +40,9 @@ class GatewayException extends Exception
      * @param string|null $msg
      * @since version 1.0
      */
-    public function __construct($code, string $msg="")
+    public function __construct($code, string $msg = "")
     {
-        parent::__construct(empty($msg) ? $this->_getMessageConstName($code) : $msg,$code);
+        parent::__construct(empty($msg) ? $this->_getMessageConstName($code) : $msg, $code);
     }
 
     /**
@@ -45,16 +55,15 @@ class GatewayException extends Exception
      *
      * @since version 1.0
      */
-    private function _getMessageConstName (string $val):string {
-        $rc = new ReflectionClass ( 'Alfabank\Exceptions\GatewayException' );
+    private function _getMessageConstName(string $val): string
+    {
+        $rc = new ReflectionClass ('Alfabank\Exceptions\GatewayException');
         $constants = $rc->getConstants();
 
-        foreach ( $constants as $name => $value )
-        {
-            if ( $value == $val )
-            {
+        foreach ($constants as $name => $value) {
+            if ($value == $val) {
                 // нашли константу, выводим ее наименование с суффиксом
-                return $name.'_MSG';
+                return $name . '_MSG';
                 break;
             }
         }

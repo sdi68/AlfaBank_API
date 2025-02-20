@@ -1,18 +1,18 @@
 <?php
-/*
- * AlfaHelper.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
 
+use Alfabank\Exceptions\GatewayException;
 use Exception;
 
 /**
@@ -35,48 +35,28 @@ abstract class AlfaHelper
 {
 
     /**
-     * Логирование требует переопределения в наследнике
-     * @param array $logdata
-     * @param bool $enabled
-     *
-     * @return void
-     * @since 1.0
-     */
-    public abstract static function _logging(array $logdata, bool $enabled = false);
-
-
-    /**
-     * Выводит текст, определяемый константой
-     * Необходимо переопределить в наследнике, например для JOOMLA исполльзовать в конструкции JText::_($text)
-     * Если входной параметр не константа, то возвращает false, в противном случае - текст
-     * @param $text
-     * @return false|mixed
-     * @since version 1.0
-     */
-    protected abstract static function _translate($text);
-
-    /**
      * @param array $data Параметры платежного уведомления альфа-банка
      * @param object $vars Параметры заказа
      * @param string $login Логин
      * @param string $password Пароль
+     * @param string $token Токе безопасности (вместо логина и пароля)
      * @param string $returnURL URL возврата после платежа
      * @param bool $enable_log Разрешить логирование
      * @param bool $prod_mode Режим работы тест/продуктивный
+     *
      * @return array
-     * @throws Exception
+     * @throws GatewayException
      * @since version 1.0
      *
-     *
      */
-    public static final function validate($data, object $vars, string $login = '', string $password = '', string $returnURL = '', bool $enable_log = false, bool $prod_mode = false): array
+    public static final function validate($data, object $vars, string $login = '', string $password = '', string $token = '', string $returnURL = '', bool $enable_log = false, bool $prod_mode = false): array
     {
         static::_logging(array(static::_translate('PAYMENT_VALIDATION_STARTED')), $enable_log);
         if (is_array($data)) {
 
-            $handler = new AlfaHandlerRest($login, $password, $returnURL);
+            $handler = new AlfaHandlerRest($login, $password, $token, $returnURL);
             try {
-                $params = new OrderStatusParams($login,$password,(float)$vars->amount * 100,$data['mdOrder']);
+                $params = new OrderStatusParams($login, $password, $token, (float)$vars->amount * 100, $data['mdOrder']);
                 $orderInfo = $handler->getOrderInfo($params, $prod_mode);
             } catch (Exception $e) {
                 static::_logging(json_decode(json_encode($e), true), $enable_log);
@@ -136,4 +116,24 @@ abstract class AlfaHelper
                         'msg' => static::_translate('PAYMENT_VALIDATION_ERROR_MISSING_DATA_MSG')));
         }
     }
+
+    /**
+     * Логирование требует переопределения в наследнике
+     * @param array $logdata
+     * @param bool $enabled
+     *
+     * @return void
+     * @since 1.0
+     */
+    public abstract static function _logging(array $logdata, bool $enabled = false);
+
+    /**
+     * Выводит текст, определяемый константой
+     * Необходимо переопределить в наследнике, например для JOOMLA исполльзовать в конструкции JText::_($text)
+     * Если входной параметр не константа, то возвращает false, в противном случае - текст
+     * @param $text
+     * @return false|mixed
+     * @since version 1.0
+     */
+    protected abstract static function _translate($text);
 }

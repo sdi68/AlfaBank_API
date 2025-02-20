@@ -1,55 +1,41 @@
 <?php
-/*
- * AlfaHandlerRest.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
+
 use Alfabank\Exceptions\GatewayException;
+use AlfaBank_API\DblOrderParams;
 
-
-/**
- * @version 1.1
- * @since 1.0
- */
 class AlfaHandlerRest
 {
-    protected $USERNAME;
-    protected $PASSWORD;
-    protected $RETURN_URL;
-    protected $client;
-
+    /**
+     * @var GatewayRest
+     * @since 1.0
+     */
+    protected GatewayRest $client;
 
     /**
-     * @param $USERNAME
-     * @param $PASSWORD
-     * @param $RETURN_URL
-     * @throws GatewayException
      * @since version 1.0
      */
-    public function __construct($USERNAME, $PASSWORD, $RETURN_URL)
+    public function __construct()
     {
-        if(empty($USERNAME) || empty($PASSWORD) || empty($RETURN_URL)){
-            throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_EMPTY_PARAMS_CODE);
-        }
-        $this->USERNAME = $USERNAME;
-        $this->PASSWORD = $PASSWORD;
-        $this->RETURN_URL = $RETURN_URL;
-        $this->client = new GatewayRest($this->USERNAME,$this->PASSWORD);
+        $this->client = new GatewayRest();
     }
 
     /**
      * ЗАПРОС РЕГИСТРАЦИИ ОДНОСТАДИЙНОГО ПЛАТЕЖА В ПЛАТЕЖНОМ ШЛЮЗЕ С ПОЛНЫМИ ПАРАМЕТРАМИ
      * @param OrderParams $orderParams Параметры запроса
      * @param bool $prod
-     * @return array|null
+     * @return array
      * @throws GatewayException
      * @since 1.1
      *
@@ -82,12 +68,11 @@ class AlfaHandlerRest
      * 13    Мерчант не имеет привилегии выполнять AUTO платежи
      * 13    Мерчант не имеет привилегии выполнять проверочные платежи
      * 14    Features указаны некорректно
-     *
      */
-    public function createOrderSinglePayment(OrderParams $orderParams, bool $prod=false ): array
+    public function createOrderSinglePayment(OrderParams $orderParams, bool $prod = false): array
     {
         $params = $orderParams->getParamsArray();
-        return $this->client->registerDo($params,$prod);
+        return $this->client->registerDo($params, $prod);
     }
 
     /**
@@ -113,10 +98,10 @@ class AlfaHandlerRest
      *       ACCEPTED - заказ оплачен.
      *
      */
-    public function getOrderQR(SBPParams $SBPParams, bool $prod=false): array
+    public function getOrderQR(SBPParams $SBPParams, bool $prod = false): array
     {
         $params = $SBPParams->getParamsArray();
-        return $this->client->qetQR($params,$prod);
+        return $this->client->qetQR($params, $prod);
     }
 
     /**
@@ -146,30 +131,19 @@ class AlfaHandlerRest
      *      5           Ошибка значения параметра запроса.
      *      7           Системная ошибка.
      *
-     * @param string $orderNumber
-     * @param int $amount (Минимальная единица валюты. Пример 1 копейка. Минимальный размер платежа 1 единица валюты - 1 рубль)
-     * @param string $lang в формате 'ru','en'
-     * @param string $currency код валюты по ISO 4217
-     * @param bool $returnPaymentOrderId
+     * @param DblOrderParams $dblOrderParams Параметры заказа
      * @param bool $prod
      * @return array (в случае успеха возвращает ссылку на форму оплаты или ID в платежной системе если установлен $returnPaymentOrderId = true)
      * @throws Exceptions\GatewayException
      * @since 1.0
      */
-    public function createOrderDoublePayment(string $orderNumber, int $amount, string $lang='ru', string $currency='', bool $returnPaymentOrderId=false, bool $prod=false): array
+    public function createOrderDoublePayment(DblOrderParams $dblOrderParams, bool $prod = false): array
     {
-        $params = array(
-            'userName' => $this->USERNAME,
-            'password' => $this->PASSWORD,
-            'orderNumber' => urlencode($orderNumber),
-            'amount' => urlencode($amount),
-            'returnUrl' => $this->RETURN_URL,
-            'language'=>$lang
-        );
+        $params = $dblOrderParams->getParamsArray();;
         if (!empty($currency)) {
             $params['currency'] = $currency;
         }
-        return $this->client->registerPreAuth($params,$returnPaymentOrderId,$prod);
+        return $this->client->registerPreAuth($params, $prod);
 
     }
 
@@ -209,16 +183,16 @@ class AlfaHandlerRest
      * @throws GatewayException
      * @since version 1.0
      */
-    public function getOrderInfo(OrderStatusParams $data, bool $prod=false): array
+    public function getOrderInfo(OrderStatusParams $data, bool $prod = false): array
     {
         $params = $data->getParamsArray();
-        return $this->client->getOrderInfo($params,$prod);
+        return $this->client->getOrderInfo($params, $prod);
     }
 
 
     /**
-     * @param SBPOrderInfoParams $data  Параметры запроса
-     * @param bool $prod                Флаг работы в тестовой или продуктивной среде
+     * @param SBPOrderInfoParams $data Параметры запроса
+     * @param bool $prod Флаг работы в тестовой или продуктивной среде
      * @return array
      * @throws GatewayException
      * @since version 1.1
@@ -242,9 +216,10 @@ class AlfaHandlerRest
      *      DEPOSITED - оплачен
      *
      */
-    public function getOrderInfoSBP(SBPOrderInfoParams $data, bool $prod=false): array {
+    public function getOrderInfoSBP(SBPOrderInfoParams $data, bool $prod = false): array
+    {
         $params = $data->getParamsArray();
-        return $this->client->getOrderInfoSBP($params,$prod);
+        return $this->client->getOrderInfoSBP($params, $prod);
     }
 
 }

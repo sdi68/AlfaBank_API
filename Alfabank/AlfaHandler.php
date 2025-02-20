@@ -1,17 +1,17 @@
 <?php
-/*
- * AlfaHandler.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
+
 use Alfabank\Gateway;
 
 class AlfaHandler
@@ -25,14 +25,14 @@ class AlfaHandler
 
     public function __construct($USERNAME, $PASSWORD, $RETURN_URL)
     {
-        if(empty($USERNAME) || empty($PASSWORD) || empty($RETURN_URL)){
+        if (empty($USERNAME) || empty($PASSWORD) || empty($RETURN_URL)) {
             throw new \Exception('Empty requared parameters');
         }
         $this->USERNAME = $USERNAME;
         $this->PASSWORD = $PASSWORD;
         $this->RETURN_URL = $RETURN_URL;
-        $this->client = new Gateway($this->WSDL,array('trace' => true));
-        $this->client->initAuth($this->USERNAME,$this->PASSWORD);
+        $this->client = new Gateway($this->WSDL, array('trace' => true));
+        $this->client->initAuth($this->USERNAME, $this->PASSWORD);
     }
 
     /**
@@ -70,22 +70,23 @@ class AlfaHandler
      * @return array
      * @throws \Exception
      */
-    public function createOrderSinglePayment($orderNumber,$amount,$lang='ru',$currency=''){
+    public function createOrderSinglePayment($orderNumber, $amount, $lang = 'ru', $currency = '')
+    {
         $params = array(
             'returnUrl' => $this->RETURN_URL,
             'merchantOrderNumber' => urlencode($orderNumber),
             'amount' => urlencode($amount),
-            'language'=>$lang,
+            'language' => $lang,
         );
-        if(!empty($currency)){
-            $params['currency']=$currency;
+        if (!empty($currency)) {
+            $params['currency'] = $currency;
         }
         $data = array('orderParams' => $params);
 
         $response = $this->client->__call('registerOrder', $data);
 
         if ($response->errorCode != 0) {
-            throw new \Exception($response->errorCode.' : '.$response->errorMessage);
+            throw new \Exception($response->errorCode . ' : ' . $response->errorMessage);
         } else {
             return $response;
         }
@@ -128,26 +129,27 @@ class AlfaHandler
      * @return mixed (в случае успеха возвращает ссылку на форму оплаты или ID в платежной системе если установлен $returnPaymentOrderId = true)
      * @throws \Exception
      */
-    public function createOrderDoublePayment($orderNumber,$amount,$lang='ru',$currency='',$returnPaymentOrderId=false){
+    public function createOrderDoublePayment($orderNumber, $amount, $lang = 'ru', $currency = '', $returnPaymentOrderId = false)
+    {
         $params = array(
             'returnUrl' => $this->RETURN_URL,
             'merchantOrderNumber' => urlencode($orderNumber),
             'amount' => urlencode($amount),
-            'language'=>$lang
+            'language' => $lang
         );
-        if(!empty($currency)){
-            $params['currency']=$currency;
+        if (!empty($currency)) {
+            $params['currency'] = $currency;
         }
         $data = array('orderParams' => $params);
 
         $response = $this->client->__call('registerOrderPreAuth', $data);
 
         if ($response->errorCode != 0) {
-            throw new \Exception($response->errorCode.' : '.$response->errorMessage);
+            throw new \Exception($response->errorCode . ' : ' . $response->errorMessage);
         } else {
-            if($returnPaymentOrderId===false){
+            if ($returnPaymentOrderId === false) {
                 return $response->formUrl;
-            }else{
+            } else {
                 return $response->orderId;
             }
 
@@ -192,8 +194,9 @@ class AlfaHandler
      * @throws \Exception
      */
 
-    public function getOrderInfo($orderId){
-        if(empty($orderId)){
+    public function getOrderInfo($orderId)
+    {
+        if (empty($orderId)) {
             throw new \Exception('Empty orderId');
         }
         $data = array('orderParams' => array('orderId' => $orderId));
@@ -202,32 +205,56 @@ class AlfaHandler
         $responseErrorCode = $response->errorCode;
         $responseOrderStatus = $response->orderStatus;
 
-        switch ($responseErrorCode){
-            case 0: $errorMsg = 'Обработка запроса прошла без системных ошибок'; break;
-            case 2: $errorMsg = 'Заказ отклонен по причине ошибки в реквизитах платежа'; break;
-            case 5: $errorMsg = 'Доступ запрещён, пользователь должен сменить свой пароль или номер заказа не указан'; break;
-            case 6: $errorMsg = 'Неизвестный номер заказа'; break;
-            case 7: $errorMsg = 'Системная ошибка'; break;
+        switch ($responseErrorCode) {
+            case 0:
+                $errorMsg = 'Обработка запроса прошла без системных ошибок';
+                break;
+            case 2:
+                $errorMsg = 'Заказ отклонен по причине ошибки в реквизитах платежа';
+                break;
+            case 5:
+                $errorMsg = 'Доступ запрещён, пользователь должен сменить свой пароль или номер заказа не указан';
+                break;
+            case 6:
+                $errorMsg = 'Неизвестный номер заказа';
+                break;
+            case 7:
+                $errorMsg = 'Системная ошибка';
+                break;
         }
 
-        switch ($responseOrderStatus){
-            case 0: $statusMsg = 'Заказ зарегистрирован, но не оплачен'; break;
-            case 1: $statusMsg = 'Предавторизованная сумма захолдирована (для двухстадийных платежей)'; break;
-            case 2: $statusMsg = 'Проведена полная авторизация суммы заказа'; break;
-            case 3: $statusMsg = 'Авторизация отменена'; break;
-            case 4: $statusMsg = 'По транзакции была проведена операция возврата'; break;
-            case 5: $statusMsg = 'Инициирована авторизация через ACS банка-эмитента'; break;
-            case 6: $statusMsg = 'Авторизация отклонена'; break;
+        switch ($responseOrderStatus) {
+            case 0:
+                $statusMsg = 'Заказ зарегистрирован, но не оплачен';
+                break;
+            case 1:
+                $statusMsg = 'Предавторизованная сумма захолдирована (для двухстадийных платежей)';
+                break;
+            case 2:
+                $statusMsg = 'Проведена полная авторизация суммы заказа';
+                break;
+            case 3:
+                $statusMsg = 'Авторизация отменена';
+                break;
+            case 4:
+                $statusMsg = 'По транзакции была проведена операция возврата';
+                break;
+            case 5:
+                $statusMsg = 'Инициирована авторизация через ACS банка-эмитента';
+                break;
+            case 6:
+                $statusMsg = 'Авторизация отклонена';
+                break;
         }
 
         return array(
-            'error'=>array(
-                'code'=>$responseErrorCode,
-                'msg'=> $errorMsg
+            'error' => array(
+                'code' => $responseErrorCode,
+                'msg' => $errorMsg
             ),
-            'status'=>array(
-                'code'=>$responseOrderStatus,
-                'msg'=>$statusMsg
+            'status' => array(
+                'code' => $responseOrderStatus,
+                'msg' => $statusMsg
             )
         );
     }

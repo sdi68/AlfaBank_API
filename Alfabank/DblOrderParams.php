@@ -10,15 +10,16 @@
  * @link       https://econsultlab.ru
  */
 
-namespace Alfabank;
+namespace AlfaBank_API;
 
 use Alfabank\Common\AbstractParams;
+use Alfabank\Exceptions;
 
 /**
- * Класс параметров запроса статуса заказа
+ * Класс параметров двухстадийного заказа
  * @since 1.0
  */
-class OrderStatusParams extends AbstractParams
+class DblOrderParams extends AbstractParams
 {
 
     /**
@@ -30,36 +31,53 @@ class OrderStatusParams extends AbstractParams
         string $userName,
         string $password,
         string $token,
+        string $orderNumber,
         int    $amount,
-        string $orderId,
-        string $language = "ru"
+        string $lang,
+        string $currency,
+        bool   $returnPaymentOrderId
     )
     {
+
         parent::__construct($userName, $password, $token);
 
         $this->_params = array_merge($this->_params, array(
             array(
+                "name" => "orderNumber",
+                "type" => "string",
+                "required" => true,
+                "value" => ""
+            ),
+            array(
                 "name" => "amount",
                 "type" => "numeric",
                 "required" => true,
-                "value" => 0
-            ),
-            array(
-                "name" => "orderId",
-                "type" => "string",
-                "required" => true,
                 "value" => ""
             ),
             array(
-                "name" => "language",
+                "name" => "lang",
                 "type" => "string",
                 "required" => false,
                 "value" => ""
-            )
-        ));
+            ),
+            array(
+                "name" => "currency",
+                "type" => "numeric",
+                "required" => false,
+                "value" => ""
+            ),
+            array(
+                "name" => "returnPaymentOrderId",
+                "type" => "numeric",
+                "required" => false,
+                "value" => ""
+            ),
 
+        ));
         $this->_setParam('amount', $amount);
-        $this->_setParam('orderId', $orderId);
-        $this->_setParam('language', $language);
+        $this->_setParam('orderNumber', $orderNumber);
+        $this->_setParam('lang', $lang);
+        $this->_setParam('currency', $currency);
+        $this->_setParam('returnPaymentOrderId', $returnPaymentOrderId);
     }
 }

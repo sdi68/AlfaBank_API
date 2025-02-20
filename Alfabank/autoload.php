@@ -1,22 +1,21 @@
 <?php
-/*
- * autoload.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 define('ALFABANK_ROOT_PATH', dirname(__FILE__));
 
 function AlfabankLoadClass($className)
 {
-	if (strncmp('Alfabank', $className, 8) === 0) {
-        $path   = ALFABANK_ROOT_PATH;
+    if (strncmp('Alfabank', $className, 8) === 0) {
+        $path = ALFABANK_ROOT_PATH;
         $length = 8;
     } else {
         return;

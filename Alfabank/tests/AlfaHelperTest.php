@@ -1,20 +1,20 @@
 <?php
-/*
- * AlfaHelperTest.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
 
 use PHPUnit\Framework\TestCase;
 use Alfabank\tests\Helper;
+
 require_once '../autoload.php';
 
 class AlfaHelperTest extends TestCase
@@ -23,11 +23,13 @@ class AlfaHelperTest extends TestCase
     protected $password = "";
     protected $enable_log = true;
     protected $prod_mode = false;
-    protected $returnUrl ="";
+    protected $returnUrl = "";
     protected $vars, $data;
 
-    public function setUp():void {
-        $this->vars = new class{};
+    public function setUp(): void
+    {
+        $this->vars = new class {
+        };
 
         $this->vars->order_id = "JGOID-000124";
         $this->vars->client = "com_jgive";
@@ -57,7 +59,7 @@ class AlfaHelperTest extends TestCase
         $this->vars->recurring_count = 0;
         $this->vars->country_code = "";
         $this->vars->adaptiveReceiverList = array();
-        $this->data = json_decode('{"orderNumber":"JGOID-000124","mdOrder":"00847f61-237e-74df-a4d2-bc0502084b8b","operation":"deposited","status":"1"}',true);
+        $this->data = json_decode('{"orderNumber":"JGOID-000124","mdOrder":"00847f61-237e-74df-a4d2-bc0502084b8b","operation":"deposited","status":"1"}', true);
         $this->login = "sportcf-api";
         $this->password = "sportcf*?1";
         $this->prod_mode = false;
@@ -66,41 +68,41 @@ class AlfaHelperTest extends TestCase
     }
 
 
-
     public function testValidateSuccessPayment()
     {
-        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $response = Helper::validate($this->data, $this->vars, $this->login, $this->password, $this->returnUrl, $this->enable_log, $this->prod_mode);
         $this->assertIsArray($response);
-        $this->assertArrayHasKey('status',$response);
-        $this->assertArrayHasKey('response',$response);
-        $this->assertArrayHasKey('error',$response);
-        $this->assertEquals($response['error']['code'],0);
-        $this->assertEquals($response['status']['code'],2);
+        $this->assertArrayHasKey('status', $response);
+        $this->assertArrayHasKey('response', $response);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals($response['error']['code'], 0);
+        $this->assertEquals($response['status']['code'], 2);
 
     }
+
     public function testValidateErrorPaymentAmount()
     {
         // Несоответствие суммы заказа
         $this->vars->amount = 1000;
-        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $response = Helper::validate($this->data, $this->vars, $this->login, $this->password, $this->returnUrl, $this->enable_log, $this->prod_mode);
         $this->assertIsArray($response);
-        $this->assertArrayHasKey('status',$response);
-        $this->assertArrayHasKey('response',$response);
-        $this->assertArrayHasKey('error',$response);
-        $this->assertEquals(PAYMENT_VALIDATION_ERROR_AMOUNT_CODE,$response['error']['code']);
-        $this->assertEquals(2,$response['status']['code']);
+        $this->assertArrayHasKey('status', $response);
+        $this->assertArrayHasKey('response', $response);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals(PAYMENT_VALIDATION_ERROR_AMOUNT_CODE, $response['error']['code']);
+        $this->assertEquals(2, $response['status']['code']);
     }
 
     public function testValidateErrorPaymentNoPayment()
     {
         // Ошибка Неизвестный номер заказа
-        $this->data['mdOrder'] = "00847f61-237e-74df-a4d2-bc0502084b8b".'q';
-        $response = Helper::validate($this->data,$this->vars,$this->login, $this->password,$this->returnUrl, $this->enable_log,$this->prod_mode);
+        $this->data['mdOrder'] = "00847f61-237e-74df-a4d2-bc0502084b8b" . 'q';
+        $response = Helper::validate($this->data, $this->vars, $this->login, $this->password, $this->returnUrl, $this->enable_log, $this->prod_mode);
         $this->assertIsArray($response);
-        $this->assertArrayHasKey('status',$response);
-        $this->assertArrayHasKey('response',$response);
-        $this->assertArrayHasKey('error',$response);
-        $this->assertEquals(6,$response['error']['code']);
-        $this->assertEquals(null,$response['status']['code']);
+        $this->assertArrayHasKey('status', $response);
+        $this->assertArrayHasKey('response', $response);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals(6, $response['error']['code']);
+        $this->assertEquals(null, $response['status']['code']);
     }
 }

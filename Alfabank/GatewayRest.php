@@ -1,14 +1,13 @@
 <?php
-/*
- * GatewayRest.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
@@ -17,7 +16,8 @@ use Alfabank\Exceptions\GatewayException;
 
 
 /**
- *
+ * Взаимодействие с платежным шлюзом REST
+ * @since 1.0
  */
 class GatewayRest
 {
@@ -25,39 +25,16 @@ class GatewayRest
     /**
      * URL тестовой среды
      * @var string
+     * @since 1.0
      */
-    protected string $GATEWAY_URL_DBG = 'https://web.rbsuat.com/ab/rest/';
+    protected string $GATEWAY_URL_DBG = 'https://alfa.rbsuat.com/payment/rest/';
+
     /**
      * URL продуктивной среды
      * @var string
+     * @since 1.0
      */
     protected string $GATEWAY_URL_PROD = 'https://pay.alfabank.ru/payment/rest/';
-
-    /**
-     * ФУНКЦИЯ ДЛЯ ВЗАИМОДЕЙСТВИЯ С ПЛАТЕЖНЫМ ШЛЮЗОМ
-     * Для отправки POST запросов на платежный шлюз используется стандартная библиотека cURL.
-     *
-     * @param string $method Метод из API
-     * @param array $data Массив данных
-     * @param bool $prod Флаг работы в тестовой или продуктивной среде
-     * @return array|mixed
-     */
-    private function gateway(string $method, array $data, bool $prod = false)
-    {
-        $curl = curl_init(); // Инициализируем запрос
-        $url = $prod === true ? $this->GATEWAY_URL_PROD : $this->GATEWAY_URL_DBG;
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url . $method, // Полный адрес метода
-            CURLOPT_RETURNTRANSFER => true, // Возвращать ответ
-            CURLOPT_POST => true, // Метод POST
-            CURLOPT_POSTFIELDS => http_build_query($data) // Данные в запросе
-        ));
-        $response = curl_exec($curl); // Выполняем запрос
-
-        $response = json_decode($response, true); // Декодируем из JSON в массив
-        curl_close($curl); // Закрываем соединение
-        return $response; // Возвращаем ответ
-    }
 
     /**
      * ОДНОСТАДИЙНЫЙ ПЛАТЕЖ
@@ -106,7 +83,7 @@ class GatewayRest
             throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_EMPTY_PARAMS_CODE);
         }
         $response = $this->gateway('register.do', $data, $prod);
-        if(is_null($response)) {
+        if (is_null($response)) {
             throw new GatewayException(GatewayException::GATEWAY_EXCEPTION_NULL_RETURNED_CODE);
         }
         if (isset($response['errorCode'])) { // В случае ошибки вывести ее
@@ -117,14 +94,40 @@ class GatewayRest
     }
 
     /**
+     * ФУНКЦИЯ ДЛЯ ВЗАИМОДЕЙСТВИЯ С ПЛАТЕЖНЫМ ШЛЮЗОМ
+     * Для отправки POST запросов на платежный шлюз используется стандартная библиотека cURL.
+     *
+     * @param string $method Метод из API
+     * @param array $data Массив данных
+     * @param bool $prod Флаг работы в тестовой или продуктивной среде
+     * @return array|mixed
+     * @since 1.0
+     */
+    private function gateway(string $method, array $data, bool $prod = false)
+    {
+        $curl = curl_init(); // Инициализируем запрос
+        $url = $prod === true ? $this->GATEWAY_URL_PROD : $this->GATEWAY_URL_DBG;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url . $method, // Полный адрес метода
+            CURLOPT_RETURNTRANSFER => true, // Возвращать ответ
+            CURLOPT_POST => true, // Метод POST
+            CURLOPT_POSTFIELDS => http_build_query($data) // Данные в запросе
+        ));
+        $response = curl_exec($curl); // Выполняем запрос
+
+        $response = json_decode($response, true); // Декодируем из JSON в массив
+        curl_close($curl); // Закрываем соединение
+        return $response; // Возвращаем ответ
+    }
+
+    /**
      * ДВУХСТАДИЙНЫЙ ПЛАТЕЖ
      * Запрос предавторизации платежа
      *
      * @param array $data Данные платежа
+     * @param bool $prod Продуктивная или тестовая среда
      * @return array
-     * @throws GatewayException
-     *
-     * КОДЫ ОШИБОК
+     * @throws GatewayException КОДЫ ОШИБОК
      * 0    Обработка запроса прошла без системных ошибок
      * 1    Заказ с таким номером уже обработан
      * 1    Заказ с таким номером был зарегистрирован, но не был оплачен
@@ -153,12 +156,11 @@ class GatewayRest
      * formUrl            URL платёжной формы, на который надо перенаправить броузер клиента. Не возвращается если регистрация заказа не удалась по причине ошибки, детализированной в errorCode.
      * errorCode        Код ошибки.
      * errorMessage        Описание ошибки на языке, переданном в параметре language в запросе.
-     *
      * @since version 1.0
      */
-    public function registerPreAuth(array $data): array
+    public function registerPreAuth(array $data, bool $prod = false): array
     {
-        $response = $this->gateway('registerPreAuth.do', $data);
+        $response = $this->gateway('registerPreAuth.do', $data, $prod);
         if (isset($response['errorCode'])) { // В случае ошибки вывести ее
             throw new GatewayException($response['errorCode'], $response['errorMessage']);
         } else { // В случае успеха перенаправить пользователя на платежную форму

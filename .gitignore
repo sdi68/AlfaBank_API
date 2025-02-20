@@ -1,0 +1,8 @@
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+/vendor/
+/.phpunit.result.cache
+/composer.phar

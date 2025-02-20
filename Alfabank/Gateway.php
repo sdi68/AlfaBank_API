@@ -1,14 +1,13 @@
 <?php
-/*
- * Gateway.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
@@ -18,38 +17,20 @@ namespace Alfabank;
  * КЛАСС ДЛЯ ВЗАИМОДЕЙСТВИЯ С ПЛАТЕЖНЫМ ШЛЮЗОМ
  * Класс наследуется от стандартного класса SoapClient.
  */
-class Gateway extends \SoapClient {
+class Gateway extends \SoapClient
+{
 
     protected $USERNAME;
     protected $PASSWORD;
 
-    public function initAuth($login,$pass){
-        if(empty($login) || empty($pass)){
+    public function initAuth($login, $pass)
+    {
+        if (empty($login) || empty($pass)) {
             throw new \Exception('Empty Login or Pass');
         }
 
         $this->USERNAME = $login;
         $this->PASSWORD = $pass;
-    }
-
-    /**
-     * АВТОРИЗАЦИЯ В ПЛАТЕЖНОМ ШЛЮЗЕ
-     * Генерация SOAP-заголовка для WS_Security.
-     *
-     * ОТВЕТ
-     *      SoapHeader      SOAP-заголовок для авторизации
-     */
-    private function generateWSSecurityHeader() {
-        $xml = '
-            <wsse:Security SOAP-ENV:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-                <wsse:UsernameToken>
-                    <wsse:Username>' . $this->USERNAME . '</wsse:Username>
-                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' . $this->PASSWORD . '</wsse:Password>
-                    <wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">' . sha1(mt_rand()) . '</wsse:Nonce>
-                </wsse:UsernameToken>
-            </wsse:Security>';
-
-        return new \SoapHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', new \SoapVar($xml, XSD_ANYXML), true);
     }
 
     /**
@@ -63,8 +44,30 @@ class Gateway extends \SoapClient {
      * ОТВЕТ
      *      response    Ответ.
      */
-    public function __call($method, $data) {
+    public function __call($method, $data)
+    {
         $this->__setSoapHeaders($this->generateWSSecurityHeader()); // Устанавливаем заголовок для авторизации
         return parent::__call($method, $data); // Возвращаем результат метода SoapClient::__call()
+    }
+
+    /**
+     * АВТОРИЗАЦИЯ В ПЛАТЕЖНОМ ШЛЮЗЕ
+     * Генерация SOAP-заголовка для WS_Security.
+     *
+     * ОТВЕТ
+     *      SoapHeader      SOAP-заголовок для авторизации
+     */
+    private function generateWSSecurityHeader()
+    {
+        $xml = '
+            <wsse:Security SOAP-ENV:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+                <wsse:UsernameToken>
+                    <wsse:Username>' . $this->USERNAME . '</wsse:Username>
+                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' . $this->PASSWORD . '</wsse:Password>
+                    <wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">' . sha1(mt_rand()) . '</wsse:Nonce>
+                </wsse:UsernameToken>
+            </wsse:Security>';
+
+        return new \SoapHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', new \SoapVar($xml, XSD_ANYXML), true);
     }
 }

@@ -1,14 +1,13 @@
 <?php
-/*
- * OrderParamsTest.php
- * Created for project JOOMLA 3.x
- * subpackage PAYMENT/CPGALFABANK plugin
- * based on https://github.com/SatanaKonst/AlfaBank_API
- * version 1.0.0
- * https://econsultlab.ru
- * mail: info@econsultlab.ru
- * Released under the GNU General Public License
- * Copyright (c) 2022 Econsult Lab.
+/**
+ * @package    AlfaBank_API
+ * @subpackage    AlfaBank_API
+ * @version    1.0.2
+ * @author Econsult Lab.
+ * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
+ * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
+ * @license    GNU/GPL license: https://www.gnu.org/copyleft/gpl.html
+ * @link       https://econsultlab.ru
  */
 
 namespace Alfabank;
@@ -24,7 +23,8 @@ class OrderParamsTest extends TestCase
 {
     protected object $_op;
 
-    public function test__construct () {
+    public function test__construct()
+    {
         $this->_op = new OrderParams(
             'userName',
             'password',
@@ -73,7 +73,8 @@ class OrderParamsTest extends TestCase
         $this->assertEquals('features', $this->_op->getParamByName('features')['value']);
     }
 
-    public function testGetParamsArray() {
+    public function testGetParamsArray()
+    {
         $this->_op = new OrderParams(
             'userName',
             'password',
@@ -100,10 +101,11 @@ class OrderParamsTest extends TestCase
         );
         $test = $this->_op->getParamsArray();
         $this->assertIsArray($test);
-        $this->assertArrayHasKey('userName',$test,'В массиве нет поля userName');
+        $this->assertArrayHasKey('userName', $test, 'В массиве нет поля userName');
     }
 
-    public function testValidateParamsValueRequiredThrowsException(){
+    public function testValidateParamsValueRequiredThrowsException()
+    {
         $this->expectException(OrderParamsException::class);
         $this->_op = new OrderParams(
             '',
@@ -130,7 +132,9 @@ class OrderParamsTest extends TestCase
             'features'
         );
     }
-    public function testUnknownParamsNameThrowsException(){
+
+    public function testUnknownParamsNameThrowsException()
+    {
         $this->expectException(OrderParamsException::class);
         $this->_op = new OrderParams(
             1234,
