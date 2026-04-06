@@ -2,7 +2,7 @@
 /**
  * @package    AlfaBank_API
  * @subpackage    AlfaBank_API
- * @version    1.0.2
+ * @version    1.0.3
  * @author Econsult Lab.
  * @based on   https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html
  * @copyright  Copyright (c) 2025 Econsult Lab. All rights reserved.
@@ -31,6 +31,15 @@ class GatewayRest
 
     /**
      * URL продуктивной среды
+     * Для логинов доступа к API c префиксом r-
+     * @var string
+     * @since 1.0.3
+     */
+    protected string $GATEWAY_URL_PROD_R = 'https://payment.alfabank.ru/payment/rest/';
+
+    /**
+     * URL продуктивной среды
+     * Для логинов доступа к API без префикса r-
      * @var string
      * @since 1.0
      */
@@ -106,7 +115,12 @@ class GatewayRest
     private function gateway(string $method, array $data, bool $prod = false)
     {
         $curl = curl_init(); // Инициализируем запрос
-        $url = $prod === true ? $this->GATEWAY_URL_PROD : $this->GATEWAY_URL_DBG;
+        $prodURL = match (true){
+            !empty($data["prodURLType"]) => $this->GATEWAY_URL_PROD."_".$data["prodURLType"],
+            default => $this->GATEWAY_URL_PROD
+        };
+
+        $url = $prod === true ? $prodURL : $this->GATEWAY_URL_DBG;
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url . $method, // Полный адрес метода
             CURLOPT_RETURNTRANSFER => true, // Возвращать ответ

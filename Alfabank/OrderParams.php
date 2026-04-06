@@ -13,6 +13,7 @@
 namespace Alfabank;
 
 use Alfabank\Common\AbstractParams;
+use Alfabank\Exceptions\ParamsException;
 
 /**
  * Класс параметров заказа
@@ -23,7 +24,30 @@ class OrderParams extends AbstractParams
 
     /**
      * Конструктор класса
-     * @throws Exceptions\ParamsException
+     * @param string $userName
+     * @param string $password
+     * @param string $token
+     * @param int $amount
+     * @param string $orderNumber
+     * @param string $returnUrl
+     * @param int $currency
+     * @param string $failUrl
+     * @param string $dynamicCallbackUrl
+     * @param string $email
+     * @param string $phone
+     * @param string $description
+     * @param string $language
+     * @param string $ip
+     * @param string $pageView
+     * @param string $clientId
+     * @param string $merchantLogin
+     * @param string $jsonParams
+     * @param int $sessionTimeoutSecs
+     * @param string $expirationDate
+     * @param string $bindingId
+     * @param string $features
+     * @param string $prodURLType Определяет тип используемого продуктивного URL ("" или "R")
+     * @throws ParamsException
      * @since 1.0
      */
     public function __construct(
@@ -48,7 +72,8 @@ class OrderParams extends AbstractParams
         int    $sessionTimeoutSecs = 0,
         string $expirationDate = "",
         string $bindingId = "",
-        string $features = ""
+        string $features = "",
+        string $prodURLType = "",
     )
     {
 
@@ -59,115 +84,144 @@ class OrderParams extends AbstractParams
                 "name" => "amount",
                 "type" => "numeric",
                 "required" => true,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "orderNumber",
                 "type" => "string",
                 "required" => true,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "returnUrl",
                 "type" => "string",
                 "required" => true,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "currency",
                 "type" => "numeric",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "failUrl",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "dynamicCallbackUrl",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "email",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "phone",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "description",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "language",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "ip",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "pageView",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "clientId",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "merchantLogin",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "jsonParams",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "sessionTimeoutSecs",
                 "type" => "numeric",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "expirationDate",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "bindingId",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
             ),
             array(
                 "name" => "features",
                 "type" => "string",
                 "required" => false,
-                "value" => ""
+                "value" => "",
+                "service" =>false
+            ),
+            /**
+             * Определяет тип используемого продуктивного URL
+             */
+            array(
+                "name" => "prodURLType",
+                "type" => "string",
+                "required" => false,
+                "value" => "",
+                "service" =>true
             ),
         ));
         $this->_setParam('amount', $amount);
@@ -189,5 +243,6 @@ class OrderParams extends AbstractParams
         $this->_setParam('expirationDate', $expirationDate);
         $this->_setParam('bindingId', $bindingId);
         $this->_setParam('features', $features);
+        $this->_setParam('prodURLType', $prodURLType);
     }
 }
