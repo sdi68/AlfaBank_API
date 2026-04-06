@@ -72,18 +72,21 @@ abstract class AbstractParams
                     "type" => "string",
                     "required" => false,
                     "value" => "",
+                    "service" =>false
                 ),
                 array(
                     "name" => "password",
                     "type" => "string",
                     "required" => false,
-                    "value" => ""
+                    "value" => "",
+                    "service" =>false
                 ),
                 array(
                     "name" => "token",
                     "type" => "string",
                     "required" => true,
-                    "value" => ""
+                    "value" => "",
+                    "service" =>false
                 )
             );
             $this->_setParam('token', $token);
@@ -94,18 +97,21 @@ abstract class AbstractParams
                     "type" => "string",
                     "required" => true,
                     "value" => "",
+                    "service" =>false
                 ),
                 array(
                     "name" => "password",
                     "type" => "string",
                     "required" => true,
-                    "value" => ""
+                    "value" => "",
+                    "service" =>false
                 ),
                 array(
                     "name" => "token",
                     "type" => "string",
                     "required" => false,
-                    "value" => ""
+                    "value" => "",
+                    "service" =>false
                 )
             );
             $this->_setParam('userName', $userName);
@@ -127,7 +133,6 @@ abstract class AbstractParams
         if ($key !== false) {
             $this->_params[$key]['value'] = $paramValue;
             $this->_validate($key);
-            return;
         }
     }
 
@@ -186,7 +191,7 @@ abstract class AbstractParams
     {
         $out = array();
         foreach ($this->_params as $param) {
-            if (!$withEmptyNotRequired && $param['required'] == false && empty($param['value']))
+            if (!$withEmptyNotRequired && $param['required'] == false && empty($param['value']) || $param['service'])
                 continue;
             $out[$param['name']] = $param['value'];
         }
