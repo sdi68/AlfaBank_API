@@ -116,9 +116,11 @@ class GatewayRest
     {
         $curl = curl_init(); // Инициализируем запрос
         $prodURL = match (true){
-            !empty($data["prodURLType"]) => $this->GATEWAY_URL_PROD."_".$data["prodURLType"],
-            default => $this->GATEWAY_URL_PROD
+            !empty($data["service"]["prodURLType"]) => "GATEWAY_URL_PROD_".$data["service"]["prodURLType"],
+            default => "GATEWAY_URL_PROD"
         };
+        $prodURL = $this->{$prodURL};
+        unset($data["service"]);
 
         $url = $prod === true ? $prodURL : $this->GATEWAY_URL_DBG;
         curl_setopt_array($curl, array(

@@ -215,6 +215,7 @@ class OrderParams extends AbstractParams
             ),
             /**
              * Определяет тип используемого продуктивного URL
+             * @since 1.0.3
              */
             array(
                 "name" => "prodURLType",

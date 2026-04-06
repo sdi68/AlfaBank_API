@@ -191,9 +191,15 @@ abstract class AbstractParams
     {
         $out = array();
         foreach ($this->_params as $param) {
-            if (!$withEmptyNotRequired && $param['required'] == false && empty($param['value']) || $param['service'])
+            if (!$withEmptyNotRequired && !$param['required'] && empty($param['value']))
+            {
                 continue;
-            $out[$param['name']] = $param['value'];
+            } elseif ($param['service']){
+                $out['service'][$param['name']] = $param['value'];
+            } else
+            {
+                $out[$param['name']] = $param['value'];
+            }
         }
         return $out;
     }
