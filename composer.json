@@ -3,7 +3,7 @@
   "description": "API интернет-эквайринга Альфа Банка",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "homepage": "https://pay.alfabank.ru/ecommerce/instructions/merchantManual/pages/index.html",
   "keywords": ["Альфа Банк","интернет-эквайринг", "api"],
   "authors": [
