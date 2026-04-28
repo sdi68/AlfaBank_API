@@ -194,7 +194,7 @@ abstract class AbstractParams
             if (!$withEmptyNotRequired && !$param['required'] && empty($param['value']))
             {
                 continue;
-            } elseif ($param['service']){
+            } elseif (!empty($param['service'])){
                 $out['service'][$param['name']] = $param['value'];
             } else
             {
